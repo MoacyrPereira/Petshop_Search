@@ -1,3 +1,5 @@
+using kennel.Core.Entities;
+
 namespace kennel.Core.Extensions;
 
 public class UserInput
@@ -5,7 +7,7 @@ public class UserInput
     private const int MaxDogsPerSize = 15;
     private const string DateFormat = "dd/MM/yyyy";
 
-    public record ValidationResult(bool IsValid, string ErrorMessage);
+    public record ValidationResult(bool IsValid, string ErrorMessage, Bath Bath = null);
 
     public static ValidationResult ValidateInput(string input)
     {
@@ -24,7 +26,7 @@ public class UserInput
             DateFormat, 
             null, 
             System.Globalization.DateTimeStyles.None, 
-            out _);
+            out var date);
 
         if (!isValidDate)
             return new ValidationResult(false, $"A data deve estar no formato {DateFormat}");
@@ -32,9 +34,21 @@ public class UserInput
         var isValidSmallDogs = int.TryParse(inputs[1], out int smallDogs);
         var isValidLargeDogs = int.TryParse(inputs[2], out int largeDogs);
 
-        return (!isValidSmallDogs || !isValidLargeDogs) 
-            ? new ValidationResult(false, "Quantidades de cães devem ser números válidos.")
-            : ValidateQuantities(smallDogs, largeDogs);
+        if (!isValidSmallDogs || !isValidLargeDogs)
+            return new ValidationResult(false, "Quantidades de cães devem ser números válidos.");
+
+        var validationResult = ValidateQuantities(smallDogs, largeDogs);
+        if (!validationResult.IsValid)
+            return validationResult;
+
+        var bath = new Bath
+        {
+            Date = date,
+            QuantitySmallDogs = smallDogs,
+            QuantityLargeDogs = largeDogs
+        };
+
+        return new ValidationResult(true, string.Empty, bath);
     }
 
     private static ValidationResult ValidateQuantities(int smallDogs, int largeDogs)

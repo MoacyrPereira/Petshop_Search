@@ -3,28 +3,36 @@ using kennel.Core.Repositories;
 using Kennel.Infrastructure.Repositories;
 using kennel.Core.Extensions;
 
-    Console.WriteLine("Digite a data do banho (dd/MM/yyyy), quantidade de cães pequenos e quantidade de cães grandes:");
-    string input = Console.ReadLine();
+    var resultOk = false;
+    var input = string.Empty;
+    var validationResult = new UserInput.ValidationResult(false, string.Empty);
     
-    var validationResult = UserInput.ValidateInput(input);
-        
-    if (!validationResult.IsValid)
-    {
-        Console.WriteLine($"Erro: {validationResult.ErrorMessage}");
-        Console.ReadLine();
-        return;
-    }
+    Console.WriteLine("Digite a data do banho (dd/MM/yyyy), quantidade de cães pequenos e quantidade de cães grandes:");
+    input = Console.ReadLine();
 
-    string[] inputs = input.Split(' ');
-    DateTime date = DateTime.ParseExact(inputs[0], "dd/MM/yyyy", null);
-    int qtdSmallDogs = int.Parse(inputs[1]);
-    int qtdLargeDogs = int.Parse(inputs[2]);
+    do
+    {
+        if(input == "exit")
+            return;
+        
+        validationResult = UserInput.ValidateInput(input);
+    
+        if (!validationResult.IsValid)
+        {
+            Console.WriteLine($"Erro: {validationResult.ErrorMessage}. Tente novamente:");
+            input = Console.ReadLine();
+            continue;
+        }
+
+        resultOk = true;
+    }
+    while (!resultOk);
 
     Bath bath = new Bath
     {
-        Date = date,
-        QuantitySmallDogs = qtdSmallDogs,
-        QuantityLargeDogs = qtdLargeDogs
+        Date = validationResult.Bath.Date,
+        QuantitySmallDogs = validationResult.Bath.QuantitySmallDogs,
+        QuantityLargeDogs = validationResult.Bath.QuantityLargeDogs
     };
 
     IPetShopRepository repository = new PetshopRepository();
@@ -42,4 +50,5 @@ using kennel.Core.Extensions;
         .First();
 
     Console.WriteLine($"Melhor petshop: {bestPetshop.Nome}, Preço total: R${bestPetshop.PrecoTotal:F2}");
-    Console.ReadLine();
+    Console.WriteLine("Console Finalizado! Pressione qualquer tecla para sair.");
+    Console.ReadKey();
