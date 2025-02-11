@@ -117,3 +117,27 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 Desktop.ini
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Visual Studio Code
+.vscode/
+
+# ReSharper
+_ReSharper*/
+
+# NuGet
+packages/
+
+# OS specific
+.DS_Store
+Thumbs.db
